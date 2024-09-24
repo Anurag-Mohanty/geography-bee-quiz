@@ -6,6 +6,10 @@ const fs = require('fs');
 const path = require('path');
 const cors = require('cors');
 
+const PORT = process.env.PORT || 3001;
+const PORT_MIN = 3001;
+const PORT_MAX = 3010;
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -273,10 +277,6 @@ loadQuestionsWithCache()
     .then(() => refreshQuestionCache())
     .catch(console.error);
 
-// Dynamic port identification
-const PORT_MIN = 3001;
-const PORT_MAX = 3010;
-
 const providedPort = process.argv[2] ? parseInt(process.argv[2].split('=')[1], 10) : null;
 
 function startServer(port) {
@@ -287,15 +287,18 @@ function startServer(port) {
         if (err.code === 'EADDRINUSE' && port < PORT_MAX) {
             startServer(port + 1);
         } else {
-            console.error('No available ports in the specified range');
+            console.error('No available ports in the specified range', err);
         }
     });
 }
 
-if (providedPort) {
-    startServer(providedPort);
+if (process.env.NODE_ENV === 'production') {
+  // In production (Heroku), use the PORT environment variable
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 } else {
-    startServer(PORT_MIN);
+  // In development, use the dynamic port selection
+  const providedPort = process.argv[2] ? parseInt(process.argv[2].split('=')[1], 10) : null;
+  startServer(providedPort || PORT_MIN);
 }
 
 // Serve static files from the React build in frontend
