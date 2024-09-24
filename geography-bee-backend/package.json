@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node server.js", 
     "build": "npm run build --prefix ../geography-bee-frontend",
-    "heroku-postbuild": "npm run build" 
+    "heroku-postbuild": "npm run build --prefix ../geography-bee-frontend"
   },
   "keywords": [],
   "author": "",
