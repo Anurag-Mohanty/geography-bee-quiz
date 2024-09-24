@@ -19,10 +19,12 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "cd geography-bee-backend && npm start",
+    "start:frontend": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "heroku-postbuild": "cd geography-bee-backend && npm install && cd ../geography-bee-frontend && npm install && npm run build"
   },
   "eslintConfig": {
     "extends": [
@@ -44,5 +46,6 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
-  }
+  },
+  "cacheDirectories": ["geography-bee-backend/node_modules", "geography-bee-frontend/node_modules"]
 }
