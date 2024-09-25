@@ -111,7 +111,14 @@ function preprocessText(text) {
   return text
       .replace(/\n/g, ' ')  // Replace newlines with spaces
       .replace(/\s+/g, ' ')  // Normalize spaces
-      .replace(/2020-21|2021-22|Round \d+|Page \d+/g, '')  // Remove headers, page numbers, etc.
+      // Remove various date formats and round indicators
+      .replace(/\d{4}-\d{2}|\d{4}-\d{4}|Round \d+|Page \d+/g, '')
+      // Remove file name patterns
+      .replace(/\d{4}(-\d{4})?-EMS-Nationals?-Geography-Bee-(Finals|Round-\d+|Extras)/g, '')
+      // Remove any remaining text within parentheses
+      .replace(/\([^)]*\)/g, '')
+      // Remove "ES Geography Bee" and similar patterns
+      .replace(/ES Geography Bee(\s+\d+V)?\s*-?\s*\d+/g, '')
       .trim();
 }
 
