@@ -14,7 +14,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-
 let drive;
 try {
     const auth = new google.auth.GoogleAuth({
@@ -55,7 +54,6 @@ async function loadQuestionsWithCache() {
         cachedQuestions = cachedQuestions.concat(questions);
     }
 
-    cachedQuestions = cachedQuestions.slice(0, 59);  // Limit to 59 questions or however many you have
     await fs.promises.writeFile(CACHE_FILE, JSON.stringify(cachedQuestions, null, 2));
     console.log(`Cached ${cachedQuestions.length} questions`);
 }
@@ -104,7 +102,7 @@ async function downloadAndParsePDF(fileId, fileName) {
     const data = await pdf(dataBuffer);
     await fs.promises.unlink(tempFilePath);
 
-    const questions = extractQuestionsFromText(data.text);
+    const questions = extractQuestionsFromText(data.text, fileName);
     return questions;
 }
 
@@ -117,7 +115,7 @@ function preprocessText(text) {
       .trim();
 }
 
-function extractQuestionsFromText(text) {
+function extractQuestionsFromText(text, fileName) {
   console.log('Starting question extraction process...');
   text = preprocessText(text);
 
@@ -143,7 +141,7 @@ function extractQuestionsFromText(text) {
       console.log(`Extracted clues:`, clues);
   }
 
-  console.log(`Parsed ${questions.length} valid questions`);
+  console.log(`Parsed ${questions.length} valid questions from ${fileName}`);
   return questions;
 }
 
@@ -232,28 +230,25 @@ function createClues(text) {
 
 // API endpoint to serve questions
 app.get('/api/questions', async (req, res) => {
-    const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 10;
 
-    const totalQuestions = cachedQuestions.length;
-    const totalPages = Math.ceil(totalQuestions / pageSize);
+    // Shuffle the entire array of questions
+    const shuffledQuestions = [...cachedQuestions].sort(() => 0.5 - Math.random());
 
-    const start = (page - 1) * pageSize;
-    const end = start + pageSize;
-
-    const questionsToShow = cachedQuestions.slice(start, end).map(({ questionNumber, question, answer, clues }) => ({
+    // Take the first pageSize questions
+    const questionsToShow = shuffledQuestions.slice(0, pageSize).map(
+      ({ questionNumber, question, answer, clues, sourceFile }) => ({
         questionNumber,
         question,
         answer,
-        clues
-    }));
+        clues,
+        sourceFile
+      })
+    );
 
     res.json({
-        questions: questionsToShow,
-        totalQuestions,
-        currentPage: page,
-        pageSize,
-        totalPages
+      questions: questionsToShow,
+      totalQuestions: cachedQuestions.length,
     });
 });
 
@@ -277,8 +272,6 @@ app.get('/api/refresh-cache', async (req, res) => {
 loadQuestionsWithCache()
     .then(() => refreshQuestionCache())
     .catch(console.error);
-
-const providedPort = process.argv[2] ? parseInt(process.argv[2].split('=')[1], 10) : null;
 
 function startServer(port) {
     const server = app.listen(port, () => {

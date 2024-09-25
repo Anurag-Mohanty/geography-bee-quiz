@@ -33,7 +33,7 @@ function App() {
         params: { pageSize: 10 },
       });
       if (Array.isArray(response.data.questions) && response.data.questions.length > 0) {
-        setQuestions(shuffleArray(response.data.questions));
+        setQuestions(response.data.questions);
       } else {
         throw new Error('No questions received from the server');
       }
@@ -41,12 +41,6 @@ function App() {
       setError(`Failed to fetch questions. ${error.message}`);
     }
   }, []);
-
-  {questions[currentQuestionIndex] && (
-    <small className="source-file">
-      Source: {questions[currentQuestionIndex].sourceFile}
-    </small>
-  )}
 
   useEffect(() => {
     fetchQuestions();
@@ -298,20 +292,16 @@ function App() {
   if (gameState === 'playing') {
     return (
       <div className="container">
-        {/* HEADER BAR FOR COMPACT INFO */}
         <div className="header-bar">
           <div className="header-item">Score: {score}</div>
           <div className="header-item">Time: {formatTime(timer)}</div>
           <div className="header-item">Question {currentQuestionIndex + 1} of {questions.length}</div>
         </div>
 
-        {/* Title */}
         <h1>Geography Bee Quiz</h1>
 
-        {/* Render Clues */}
         {renderClues()}
 
-        {/* Input and Submit */}
         <input
           type="text"
           value={userAnswer}
@@ -321,15 +311,19 @@ function App() {
           className="answer-input"
         />
 
-        {/* Buttons */}
         <div className="button-group">
           <button onClick={checkAnswer} className="submit-button">Submit</button>
           <button onClick={() => setCurrentClueIndex((i) => i + 1)} className="clue-button">Skip Clue</button>
           <button onClick={nextQuestion} className="question-button">Skip Question</button>
         </div>
 
-        {/* Feedback */}
         {feedback && <p className="feedback">{feedback}</p>}
+
+        {questions[currentQuestionIndex] && (
+          <small className="source-file">
+            Source: {questions[currentQuestionIndex].sourceFile}
+          </small>
+        )}
       </div>
     );
   }
