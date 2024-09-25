@@ -241,9 +241,19 @@ button:active {
   transition: background-color 0.3s ease;
 }
 
+.source-file {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  font-size: 0.8em;
+  color: #888;
+}
+
+
 /* Media Queries for Small Screens */
 @media (max-width: 768px) {
   .container {
+    padding: 10px;
     height: 95vh;
   }
 
@@ -260,7 +270,13 @@ button:active {
     font-size: 0.9rem;
   }
 
+  .answer-input, .button-group button {
+    width: 100%;
+    margin: 5px 0;
+  }
+
   .header-bar {
     font-size: 0.8em;
   }
 }
+

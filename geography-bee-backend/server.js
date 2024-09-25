@@ -135,7 +135,8 @@ function extractQuestionsFromText(text) {
           questionNumber: parseInt(questionNumber),
           question: questionText.trim(),
           answer: cleanAnswer,
-          clues
+          clues,
+          sourceFile: fileName
       });
 
       console.log(`Extracted question ${questionNumber}:`, questionText.trim());

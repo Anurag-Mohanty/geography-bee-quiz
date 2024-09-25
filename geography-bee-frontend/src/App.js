@@ -42,6 +42,12 @@ function App() {
     }
   }, []);
 
+  {questions[currentQuestionIndex] && (
+    <small className="source-file">
+      Source: {questions[currentQuestionIndex].sourceFile}
+    </small>
+  )}
+
   useEffect(() => {
     fetchQuestions();
   }, [fetchQuestions]);
