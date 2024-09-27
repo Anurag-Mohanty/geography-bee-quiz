@@ -30,7 +30,7 @@ function App() {
     try {
       const apiUrl = await getApiUrl();
       const response = await axios.get(`${apiUrl}/api/questions`, {
-        params: { pageSize: 10 },
+        params: { pageSize: 20 },
       });
       if (Array.isArray(response.data.questions) && response.data.questions.length > 0) {
         setQuestions(response.data.questions);
@@ -76,6 +76,7 @@ function App() {
       setScore(0);
       setTimer(0);
       setClueTimes([]);
+      setUserAnswer('');
     } else {
       setError('Unable to load questions. Please try again.');
       setGameState('initial');
@@ -197,6 +198,8 @@ function App() {
           }`}
         >
           <strong>Clue {index + 1}:</strong> {clue}
+          <br />
+          <small>Source: {currentQuestion.sourceFile}</small>  {/* Add the source file name */}
           {index <= currentClueIndex && <span> (Time: {formatTime(clueTimes[index] || 0)})</span>}
         </p>
       );
